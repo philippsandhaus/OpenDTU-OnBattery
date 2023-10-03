@@ -254,6 +254,56 @@ bool VeDirectFrameHandler::textRxEvent(std::string const& who, char* name, char*
 }
 
 
+static uint8_t calcHexChecksum(String message) {
+	char buffer[2];
+	uint8_t sum=0;
+
+	for (int i=0; i < message.length(); i=i+2) {
+        buffer[0] = message[i] == ':' ? '0' : message[i];
+		buffer[1] = message[i+1];
+		sum += strtoul(buffer,NULL,16);
+     }
+
+	// calculate victron check value 
+	// sum of command + flag + value + check = 0x55
+	return (0x55 - sum);
+}
+
+/*
+ *	isHexFrameValid
+ *  This function computes the checksum and validates a hex frame
+ */
+#define ascii2hex(v) (v-48-(v>='A'?7:0))
+#define hex2byte(b) (ascii2hex(*(b)))*16+((ascii2hex(*(b+1))))
+static bool isHexFrameValid(const char* buffer, int size) {
+  uint8_t checksum=0x55-ascii2hex(buffer[1]);
+  for (int i=2; i<size; i+=2) checksum -= hex2byte(buffer+i);
+  return (checksum==0);
+}
+
+// used to convert uint8_t hex into hex string 
+static char HEX_MAP[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+static String uint4toHexString(uint8_t value) {
+        return (String(HEX_MAP[(value & 0x0F)])); 
+}
+    
+static String uint8toHexString(uint8_t value) {
+    return (
+          String(HEX_MAP[(value >> 4)]) 
+        + String(HEX_MAP[(value & 0x0F)])
+    ); 
+}
+    
+static String uint16toHexString(uint16_t value) {
+    // victron uses little endian
+    return (
+          String(HEX_MAP[((value & 0xF0)>> 4)]) 
+        + String(HEX_MAP[(value & 0x0F)]) 
+        + String(HEX_MAP[((value)>> 12)]) 
+        + String(HEX_MAP[((value & 0xF00)>> 8)])
+    ); 
+}
 
 /*
  *  hexRxEvent
@@ -264,12 +314,23 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 
 	switch (inbyte) {
 	case '\n':
+		if (isHexFrameValid(_hexBuffer,_hexSize)) {
+			// TODO: handle hex frame here
+			if (_verboseLogging) _msgOut->printf("[VE.Direct] hex frame received: %.*s\r\n", _hexSize, _hexBuffer);
+			if (_hexBuffer[1]=='A') {
+				// asynchronous message
+				// TODO: Handle asynchronous message here				
+			} else {
+				// answer to previously sent command
+				// TODO: Handle answer here
+			}
+		}
 		// restore previous state
 		ret=_prevState;
 		break;
 
 	default:
-		_hexSize++;
+		_hexBuffer[_hexSize++]=inbyte;
 		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
 			_msgOut->println("[VE.Direct] hexRx buffer overflow - aborting read");
 			_hexSize=0;
@@ -290,9 +351,22 @@ bool VeDirectFrameHandler::isDataValid(veStruct const& frame) const {
 	return true;
 }
 
-uint32_t VeDirectFrameHandler::getLastUpdate() const
-{
+uint32_t VeDirectFrameHandler::getLastUpdate() const {
 	return _lastUpdate;
+}
+
+/*
+ * sendSetHexCommand
+ * This function uses set command to set uint16 value.
+ */
+void VeDirectFrameHandler::sendHexCommand(VeDirectHexCommand cmd, VeDirectHexId id, VeDirectFlag flag, uint16_t value) {
+	String txData = ":" + uint4toHexString(cmd);
+	txData += uint16toHexString(id);
+	txData += uint8toHexString(flag);
+	txData += uint16toHexString(value);
+	txData += uint8toHexString(calcHexChecksum(txData));
+	_vedirectSerial->print(txData+"\n");
+	if (_verboseLogging) _msgOut->println("[VE.Direct] send hex command: " + txData);
 }
 
 template<typename T>
@@ -311,12 +385,12 @@ template String const& VeDirectFrameHandler::getAsString(std::map<uint8_t, Strin
 template String const& VeDirectFrameHandler::getAsString(std::map<uint16_t, String> const& values, uint16_t val);
 template String const& VeDirectFrameHandler::getAsString(std::map<uint32_t, String> const& values, uint32_t val);
 
+
 /*
  * getPidAsString
  * This function returns the product id (PID) as readable text.
  */
-String VeDirectFrameHandler::veStruct::getPidAsString() const
-{
+String VeDirectFrameHandler::veStruct::getPidAsString() const {
 	static const std::map<uint16_t, String> values = {
 		{ 0x0300, F("BlueSolar MPPT 70|15") },
 		{ 0xA040, F("BlueSolar MPPT 75|50") },

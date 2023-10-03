@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "VeDirectFrameHandler.h"
+#include "VeDirectChargerController.h"
 
 template<typename T, size_t WINDOW_SIZE>
 class MovingAverage {
@@ -35,7 +35,7 @@ private:
     size_t _count;
 };
 
-class VeDirectMpptController : public VeDirectFrameHandler {
+class VeDirectMpptController : public VeDirectChargerController {
 public:
     VeDirectMpptController() = default;
 

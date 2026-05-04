@@ -3,6 +3,11 @@ export interface GridChargerTruckiConfig {
     password: string;
 }
 
+export interface GridChargerShellyConfig {
+    ip_address: string;
+    fixed_amperage: number;
+}
+
 export interface GridChargerCanConfig {
     hardware_interface: number;
     controller_frequency: number;
@@ -31,4 +36,5 @@ export interface GridChargerConfig {
     can: GridChargerCanConfig;
     huawei: GridChargerHuaweiConfig;
     trucki: GridChargerTruckiConfig;
+    shelly: GridChargerShellyConfig;
 }

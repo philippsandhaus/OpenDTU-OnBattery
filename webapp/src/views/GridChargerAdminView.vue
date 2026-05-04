@@ -84,6 +84,29 @@
                         />
                     </template>
 
+                    <template v-if="gridChargerConfigList.provider === 2">
+                        <InputElement
+                            :label="$t('gridchargeradmin.IpAddress')"
+                            v-model="gridChargerConfigList.shelly.ip_address"
+                            type="text"
+                            pattern="\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+                            maxlength="15"
+                            wide
+                        />
+
+                        <InputElement
+                            :label="$t('gridchargeradmin.ShellyFixedAmperage')"
+                            :tooltip="$t('gridchargeradmin.ShellyFixedAmperageHint')"
+                            v-model="gridChargerConfigList.shelly.fixed_amperage"
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="32"
+                            postfix="A"
+                            wide
+                        />
+                    </template>
+
                     <InputElement
                         :label="$t('gridchargeradmin.EnableAutoPower')"
                         v-model="gridChargerConfigList.auto_power_enabled"
@@ -289,6 +312,7 @@ export default defineComponent({
             providerTypeList: [
                 { key: 0, value: 'Huawei' },
                 { key: 1, value: 'Trucki' },
+                { key: 2, value: 'Shelly' },
             ],
             frequencyTypeList: [
                 { key: 8, value: 8000000 },

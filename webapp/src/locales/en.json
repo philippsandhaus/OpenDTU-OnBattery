@@ -1121,6 +1121,11 @@
             "VGRID_LOW_DELAYED": "Grid Low Delayed",
             "VGRID_LOW": "Grid Low",
             "UNKNOWN": "Unknown"
+        },
+        "ratedPower": "Rated Power",
+        "shelly": {
+            "on": "On",
+            "off": "Off"
         }
     },
     "gridchargeradmin": {
@@ -1130,6 +1135,7 @@
         "Provider": "Provider",
         "ProviderHuawei": "Huawei R48xx on CAN Bus Interface",
         "ProviderTrucki": "Trucki T2MG/T2HG",
+        "ProviderShelly": "Shelly Smart Switch",
         "HardwareInterface": "Interface Type",
         "HardwareInterfaceMCP2515": "External CAN-Controller MCP2515 over SPI",
         "HardwareInterfaceTWAI": "Internal CAN-Controller on CAN-Transceiver SN65HVD230 (VP230)",
@@ -1137,6 +1143,8 @@
         "IpAddress": "IP Address",
         "Password": "Password",
         "PasswordHint": "Leave empty if no password is set.",
+        "ShellyFixedAmperage": "Charger Current Rating",
+        "ShellyFixedAmperageHint": "The fixed AC input current of the charger connected to the Shelly switch.",
         "EnableAutoPower": "Automatic power control",
         "EnableBatterySoCLimits": "Use SoC data of a connected battery",
         "HuaweiSettings": "Huawei R48xx PSU Settings",

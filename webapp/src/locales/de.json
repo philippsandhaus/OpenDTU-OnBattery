@@ -849,7 +849,6 @@
                 "local": "Lokaler MQTT Broker",
                 "cloud": "Zendure Entwickler Schnittstelle"
             },
-
             "deviceId": "Geräte Identifikation",
             "deviceIdDescription": "Die Geräte ID muss manuell mit <a href=\"https://github.com/nograx/zendure-cloud-disconnector\" target=\"_blank\">Zendure Cloud Disconnector</a>, <a href=\"https://github.com/reinhard-brandstaedter/solarflow-bt-manager\" target=\"_blank\">Solarflow Bluetooth Manager</a> oder durch aufzeichnen des MQTT Verkehrs ermittelt werden.",
             "deviceIdInfo": "<u>Authentifizierungseinstellungen für Zendure am lokalen MQTT Broker:</u> <ul style=\"list-style-type:none;\"><li>Nutzername: {user}</li><li>Password: {pass}</li></ul>",
@@ -1119,6 +1118,11 @@
             "VGRID_LOW_DELAYED": "Netz Niedrig Verzögert",
             "VGRID_LOW": "Netz Niedrig",
             "UNKNOWN": "Unbekannt"
+        },
+        "ratedPower": "Nennleistung",
+        "shelly": {
+            "on": "Ein",
+            "off": "Aus"
         }
     },
     "gridchargeradmin": {
@@ -1134,6 +1138,8 @@
         "IpAddress": "IP Adresse",
         "Password": "Passwort",
         "PasswordHint": "Leer lassen, wenn kein Passwort gesetzt ist.",
+        "ShellyFixedAmperage": "Ladegerät Nennstrom",
+        "ShellyFixedAmperageHint": "Der feste AC-Eingangsstrom des am Shelly-Schalter angeschlossenen Ladegeräts.",
         "EnableAutoPower": "Automatische Leistungssteuerung",
         "EnableBatterySoCLimits": "Ladezustand einer angeschlossenen Batterie berücksichtigen",
         "HuaweiSettings": "Huawei R48xx Netzteileinstellungen",

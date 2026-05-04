@@ -278,6 +278,12 @@ void ConfigurationClass::serializeGridChargerTruckiConfig(GridChargerTruckiConfi
     target["password"] = source.Password;
 }
 
+void ConfigurationClass::serializeGridChargerShellyConfig(GridChargerShellyConfig const& source, JsonObject& target)
+{
+    target["ip_address"] = IPAddress(source.IpAddress).toString();
+    target["fixed_amperage"] = roundedFloat(source.FixedAmperage);
+}
+
 bool ConfigurationClass::write()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "w");
@@ -467,6 +473,9 @@ bool ConfigurationClass::write()
 
     JsonObject gridcharger_trucki = gridcharger["trucki"].to<JsonObject>();
     serializeGridChargerTruckiConfig(config.GridCharger.Trucki, gridcharger_trucki);
+
+    JsonObject gridcharger_shelly = gridcharger["shelly"].to<JsonObject>();
+    serializeGridChargerShellyConfig(config.GridCharger.Shelly, gridcharger_shelly);
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
@@ -717,6 +726,17 @@ void ConfigurationClass::deserializeGridChargerTruckiConfig(JsonObject const& so
     strlcpy(target.Password, source["password"] | "", sizeof(target.Password));
 }
 
+void ConfigurationClass::deserializeGridChargerShellyConfig(JsonObject const& source, GridChargerShellyConfig& target)
+{
+    IPAddress ip;
+    ip.fromString(source["ip_address"] | "");
+    target.IpAddress[0] = ip[0];
+    target.IpAddress[1] = ip[1];
+    target.IpAddress[2] = ip[2];
+    target.IpAddress[3] = ip[3];
+    target.FixedAmperage = source["fixed_amperage"] | GRIDCHARGER_SHELLY_FIXED_AMPERAGE;
+}
+
 bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
@@ -930,6 +950,7 @@ bool ConfigurationClass::read()
     deserializeGridChargerCanConfig(gridcharger["can"], config.GridCharger.Can);
     deserializeGridChargerHuaweiConfig(gridcharger["huawei"], config.GridCharger.Huawei);
     deserializeGridChargerTruckiConfig(gridcharger["trucki"], config.GridCharger.Trucki);
+    deserializeGridChargerShellyConfig(gridcharger["shelly"], config.GridCharger.Shelly);
 
     f.close();
 

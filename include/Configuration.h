@@ -256,7 +256,7 @@ struct BATTERY_CONFIG_T {
 };
 using BatteryConfig = struct BATTERY_CONFIG_T;
 
-enum GridChargerProviderType { HUAWEI = 0, TRUCKI = 1 };
+enum GridChargerProviderType { HUAWEI = 0, TRUCKI = 1, SHELLY = 2 };
 enum GridChargerHardwareInterface { MCP2515 = 0, TWAI = 1 };
 
 struct GRID_CHARGER_TRUCKI_CONFIG_T {
@@ -280,6 +280,12 @@ struct GRID_CHARGER_HUAWEI_CONFIG_T {
 };
 using GridChargerHuaweiConfig = struct GRID_CHARGER_HUAWEI_CONFIG_T;
 
+struct GRID_CHARGER_SHELLY_CONFIG_T {
+    uint8_t IpAddress[4];
+    float FixedAmperage;
+};
+using GridChargerShellyConfig = struct GRID_CHARGER_SHELLY_CONFIG_T;
+
 struct GRID_CHARGER_CONFIG_T {
     bool Enabled;
     bool AutoPowerEnabled;
@@ -295,6 +301,7 @@ struct GRID_CHARGER_CONFIG_T {
     GridChargerCanConfig Can;
     GridChargerHuaweiConfig Huawei;
     GridChargerTruckiConfig Trucki;
+    GridChargerShellyConfig Shelly;
 };
 using GridChargerConfig = struct GRID_CHARGER_CONFIG_T;
 
@@ -511,6 +518,7 @@ public:
     static void serializeGridChargerCanConfig(GridChargerCanConfig const& source, JsonObject& target);
     static void serializeGridChargerHuaweiConfig(GridChargerHuaweiConfig const& source, JsonObject& target);
     static void serializeGridChargerTruckiConfig(GridChargerTruckiConfig const& source, JsonObject& target);
+    static void serializeGridChargerShellyConfig(GridChargerShellyConfig const& source, JsonObject& target);
 
     static void deserializeHttpRequestConfig(JsonObject const& source_http_config, HttpRequestConfig& target);
     static void deserializeSolarChargerConfig(JsonObject const& source, SolarChargerConfig& target);
@@ -529,6 +537,7 @@ public:
     static void deserializeGridChargerCanConfig(JsonObject const& source, GridChargerCanConfig& target);
     static void deserializeGridChargerHuaweiConfig(JsonObject const& source, GridChargerHuaweiConfig& target);
     static void deserializeGridChargerTruckiConfig(JsonObject const& source, GridChargerTruckiConfig& target);
+    static void deserializeGridChargerShellyConfig(JsonObject const& source, GridChargerShellyConfig& target);
 
 private:
     void loop();

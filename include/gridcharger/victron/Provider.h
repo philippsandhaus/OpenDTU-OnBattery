@@ -31,6 +31,7 @@ private:
     float _lastSetpointA = -1.0f;
     bool  _isCharging = false;
     bool  _batteryEmergencyCharging = false;
+    bool  _remoteControlEnabled = false;
 
     uint32_t _lastPowerMeterUpdateMillis = 0;
     uint32_t _autoModeBlockedTillMillis  = 0;

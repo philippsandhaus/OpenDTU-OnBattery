@@ -50,7 +50,7 @@ void VeDirectChargerController::loop()
 
     if (!isHexCommandPossible()) { return; }
 
-    auto resetTimestamp = [this](auto& pair) {
+    auto resetTimestamp = [](auto& pair) {
         if (pair.first > 0 && (millis() - pair.first) > (10 * 1000)) {
             pair.first = 0;
         }
@@ -73,8 +73,9 @@ bool VeDirectChargerController::hexDataHandler(VeDirectHexData const& data)
 
     if (data.rsp == VeDirectHexResponse::SET) {
         switch (data.addr) {
-            case VeDirectHexRegister::ChargeCurrentLimit: return true;
-            case VeDirectHexRegister::DeviceMode:         return true;
+            case VeDirectHexRegister::BatteryMaxCurrent: return true;
+            case VeDirectHexRegister::DeviceMode:        return true;
+            case VeDirectHexRegister::RemoteOnOffMask:   return true;
             default: return false;
         }
     }
@@ -165,32 +166,42 @@ void VeDirectChargerController::sendNextHexCommandFromQueue()
 
 void VeDirectChargerController::setChargeCurrent(float ampere)
 {
+    // Rate-limit EEPROM writes (register 0xEDF0 is in the EEPROM-mapped range on MPPT).
+    auto now = millis();
+    if ((now - _lastCurrentWriteMillis) < MIN_CURRENT_WRITE_INTERVAL_MS) {
+        return;
+    }
+
+    uint32_t intValue = static_cast<uint32_t>(roundf(ampere));
+    if (static_cast<uint32_t>(roundf(_lastWrittenCurrentA)) == intValue) {
+        return; // no change — skip write
+    }
+
     for (auto& entry : _hexQueue) {
-        if (entry._hexRegister == VeDirectHexRegister::ChargeCurrentLimit) {
-            // Convert A → register units (0.1 A/unit → multiply by 10)
-            float scaled = ampere * 10.0f;
-            if (scaled >= 0 && scaled <= UINT16_MAX) {
-                entry._data = static_cast<uint32_t>(scaled);
-                DTU_LOGD("Queued charge current setpoint: %.1f A (register value %u)",
-                        ampere, entry._data.value());
-            }
+        if (entry._hexRegister == VeDirectHexRegister::BatteryMaxCurrent) {
+            entry._data = intValue; // 1 A per unit (uint16)
+            _lastCurrentWriteMillis = now;
+            _lastWrittenCurrentA = static_cast<float>(intValue);
+            DTU_LOGI("Queued BatteryMaxCurrent = %u A (0xEDF0)", intValue);
             return;
         }
     }
 }
 
+void VeDirectChargerController::enableRemoteControl()
+{
+    // Set bit 1 in register 0x0202 to enable remote on/off via 0x0200.
+    // Source: BlueSolar-HEX-protocol.pdf, register 0x0202, Note 1.
+    if (isHexCommandPossible() && isStateIdle()) {
+        sendHexCommand(VeDirectHexCommand::SET, VeDirectHexRegister::RemoteOnOffMask, 0x02, 8);
+        DTU_LOGI("Sent RemoteOnOffMask = 0x02 (remote control enabled)");
+    }
+}
+
 void VeDirectChargerController::setDeviceMode(bool on)
 {
-    // DeviceMode: 1 = Charger (on), 4 = Off
+    // DeviceMode: 1 = Charger on, 4 = Charger off
     uint32_t modeValue = on ? 1u : 4u;
-    for (auto& entry : _hexQueue) {
-        if (entry._hexRegister == VeDirectHexRegister::ChargeCurrentLimit) {
-            // Re-use the SET slot pattern by queueing DeviceMode directly
-            (void)modeValue; // sent below via sendHexCommand outside queue
-            break;
-        }
-    }
-    // Send immediately if idle; otherwise it will be picked up on the next loop tick.
     if (isHexCommandPossible() && isStateIdle()) {
         sendHexCommand(VeDirectHexCommand::SET, VeDirectHexRegister::DeviceMode, modeValue, 8);
         DTU_LOGI("Sent DeviceMode = %u (%s)", modeValue, on ? "on" : "off");

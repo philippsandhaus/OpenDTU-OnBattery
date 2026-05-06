@@ -335,11 +335,12 @@ frozen::string const& VeDirectHexData::getResponseAsString() const
 frozen::string const& VeDirectHexData::getRegisterAsString() const
 {
 	using Register = VeDirectHexRegister;
-	static constexpr frozen::map<Register, frozen::string, 22> values = {
+	static constexpr frozen::map<Register, frozen::string, 23> values = {
 		{ Register::DeviceMode, "Device Mode" },
 		{ Register::DeviceState, "Device State" },
 		{ Register::RemoteControlUsed, "Remote Control Used" },
-		{ Register::ChargeCurrentLimit, "Charge Current Limit" },
+		{ Register::RemoteOnOffMask, "Remote On/Off Mask" },
+		{ Register::BatteryMaxCurrent, "Battery Max Current" },
 		{ Register::PanelVoltage, "Panel Voltage" },
 		{ Register::PanelPower, "Panel Power" },
 		{ Register::ChargerVoltage, "Charger Voltage" },

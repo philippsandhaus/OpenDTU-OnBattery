@@ -161,10 +161,15 @@ enum class VeDirectHexRegister : uint16_t {
     DeviceMode = 0x0200,
     DeviceState = 0x0201,
     RemoteControlUsed = 0x0202,
-    // Charge current limit (0.1 A/unit); volatile RAM register — safe for frequent writes.
-    // Verified against VE.Direct Blue Smart charger HEX protocol documentation.
-    // Example from VeDirectFrameHexHandler.cpp: sendHexCommand(SET, 0x2015, 64, 16) ~= 10 A
-    ChargeCurrentLimit = 0x2015,
+    // Battery maximum current (1 A/unit, uint16).
+    // Source: BlueSolar-HEX-protocol.pdf, "Battery maximum current", register 0xEDF0.
+    // WARNING: 0xEDF0 is in the EEPROM-mapped range 0xEDE0-0xEDFF on MPPT chargers.
+    // Rate-limit writes to avoid flash wear (see VeDirectChargerController).
+    // For the Blue Smart IP22 the NVM behaviour may differ — verify before deploying.
+    BatteryMaxCurrent = 0xEDF0,
+    // Enable remote on/off control (bit 1 must be set once after power-up).
+    // Source: BlueSolar-HEX-protocol.pdf, register 0x0202.
+    RemoteOnOffMask = 0x0202,
     HistoryTotal = 0x104F,
     HistoryMPPTD30 = 0x10BE,
     BatteryVoltageSense = 0x2002,

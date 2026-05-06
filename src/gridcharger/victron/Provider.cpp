@@ -37,6 +37,7 @@ bool Provider::init()
     _controller->init(pin.victron_charger_rx, pin.victron_charger_tx, *oPort);
 
     DTU_LOGI("Initialized on rx=%d tx=%d", pin.victron_charger_rx, pin.victron_charger_tx);
+    _remoteControlEnabled = false;
     return true;
 }
 
@@ -54,6 +55,12 @@ void Provider::loop()
     if (!_controller) { return; }
 
     _controller->loop();
+
+    // Enable remote on/off control once firmware version is known (FW >= 1.53).
+    if (!_remoteControlEnabled && _controller->isDataValid()) {
+        _controller->enableRemoteControl();
+        _remoteControlEnabled = true;
+    }
 
     if (_controller->isDataValid()) {
         _stats->updateFrom(_controller->getData(), _controller->getLastUpdate());

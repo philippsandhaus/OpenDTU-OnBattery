@@ -7,7 +7,6 @@ export interface GridChargerVictronConfig {
     max_current_a: number;
 }
 
-
 export interface GridChargerCanConfig {
     hardware_interface: number;
     controller_frequency: number;

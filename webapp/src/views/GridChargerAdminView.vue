@@ -98,7 +98,6 @@
                         />
                     </template>
 
-
                     <InputElement
                         :label="$t('gridchargeradmin.EnableAutoPower')"
                         v-model="gridChargerConfigList.auto_power_enabled"

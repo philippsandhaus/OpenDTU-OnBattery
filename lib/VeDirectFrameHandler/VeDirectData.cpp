@@ -335,10 +335,11 @@ frozen::string const& VeDirectHexData::getResponseAsString() const
 frozen::string const& VeDirectHexData::getRegisterAsString() const
 {
 	using Register = VeDirectHexRegister;
-	static constexpr frozen::map<Register, frozen::string, 21> values = {
+	static constexpr frozen::map<Register, frozen::string, 22> values = {
 		{ Register::DeviceMode, "Device Mode" },
 		{ Register::DeviceState, "Device State" },
 		{ Register::RemoteControlUsed, "Remote Control Used" },
+		{ Register::ChargeCurrentLimit, "Charge Current Limit" },
 		{ Register::PanelVoltage, "Panel Voltage" },
 		{ Register::PanelPower, "Panel Power" },
 		{ Register::ChargerVoltage, "Charger Voltage" },
@@ -360,4 +361,70 @@ frozen::string const& VeDirectHexData::getRegisterAsString() const
 	};
 
 	return getAsString(values, addr);
+}
+
+frozen::string const& veChargerStruct::getCsAsString() const
+{
+	static constexpr frozen::map<uint8_t, frozen::string, 7> values = {
+		{ 0,   "Off" },
+		{ 2,   "Fault" },
+		{ 3,   "Bulk" },
+		{ 4,   "Absorption" },
+		{ 5,   "Float" },
+		{ 7,   "Storage" },
+		{ 9,   "Equalize" },
+	};
+
+	return getAsString(values, currentState_CS);
+}
+
+frozen::string const& veChargerStruct::getErrAsString() const
+{
+	static constexpr frozen::map<uint8_t, frozen::string, 20> values = {
+		{ 0,   "No error" },
+		{ 2,   "Battery voltage too high" },
+		{ 17,  "Charger temperature too high" },
+		{ 18,  "Charger over current" },
+		{ 19,  "Charger current reversed" },
+		{ 20,  "Bulk time limit exceeded" },
+		{ 21,  "Current sensor issue" },
+		{ 26,  "Terminals overheated" },
+		{ 28,  "Converter issue" },
+		{ 33,  "Input voltage too high" },
+		{ 34,  "Input current too high" },
+		{ 38,  "Input shutdown (excessive battery voltage)" },
+		{ 39,  "Input shutdown (current flow during off mode)" },
+		{ 40,  "Input" },
+		{ 65,  "Lost communication with one of devices" },
+		{ 67,  "Synchronised charging device configuration issue" },
+		{ 68,  "BMS connection lost" },
+		{ 116, "Factory calibration data lost" },
+		{ 117, "Invalid/incompatible firmware" },
+		{ 118, "User settings invalid" }
+	};
+
+	return getAsString(values, errorCode_ERR);
+}
+
+frozen::string const& veChargerStruct::getOrAsString() const
+{
+	static constexpr frozen::map<uint32_t, frozen::string, 10> values = {
+		{ 0x00000000, "Not off" },
+		{ 0x00000001, "No input power" },
+		{ 0x00000002, "Switched off (power switch)" },
+		{ 0x00000004, "Switched off (device mode register)" },
+		{ 0x00000008, "Remote input" },
+		{ 0x00000010, "Protection active" },
+		{ 0x00000020, "Paygo" },
+		{ 0x00000040, "BMS" },
+		{ 0x00000080, "Engine shutdown detection" },
+		{ 0x00000100, "Analysing input voltage" }
+	};
+
+	for (uint32_t bitCheck = 0x00000001; bitCheck <= values.rbegin()->first; bitCheck <<= 1) {
+		if ((offReason_OR & bitCheck) != 0) {
+			return getAsString(values, bitCheck);
+		}
+	}
+	return getAsString(values, offReason_OR);
 }

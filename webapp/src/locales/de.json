@@ -1134,6 +1134,8 @@
         "IpAddress": "IP Adresse",
         "Password": "Passwort",
         "PasswordHint": "Leer lassen, wenn kein Passwort gesetzt ist.",
+        "VictronMaxCurrentA": "Maximaler Ladestrom",
+        "VictronMaxCurrentAHint": "Der maximale Ladestrom des Victron Blue Smart IP22. Wird dynamisch angepasst.",
         "EnableAutoPower": "Automatische Leistungssteuerung",
         "EnableBatterySoCLimits": "Ladezustand einer angeschlossenen Batterie berücksichtigen",
         "HuaweiSettings": "Huawei R48xx Netzteileinstellungen",

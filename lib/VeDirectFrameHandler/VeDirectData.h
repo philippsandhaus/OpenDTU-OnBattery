@@ -66,6 +66,36 @@ struct veMpptStruct : veStruct {
     frozen::string const& getOrAsString() const;   // off reason as string
 };
 
+// Charge states for AC chargers (Blue Smart IP22 / IP65 etc.)
+// Values match the VE.Direct CS field.
+enum class veChargerState : uint8_t {
+    Off            = 0,
+    LowPower       = 1,
+    Fault          = 2,
+    Bulk           = 3,
+    Absorption     = 4,
+    Float          = 5,
+    Storage        = 7,
+    Equalize       = 9,
+    ExternalControl = 252,
+};
+
+struct veChargerStruct : veStruct {
+    uint8_t  currentState_CS;           // charge state (veChargerState)
+    uint8_t  errorCode_ERR;             // error code
+    uint32_t offReason_OR;              // off reason bitmask
+    uint8_t  deviceMode_MODE;           // device mode (1=charger, 4=off)
+    int16_t  outputPower_W;             // battery output power in W (calculated)
+
+    // HEX protocol values — pair.first is millis() timestamp (0 = invalid)
+    std::pair<uint32_t, uint32_t> ChargerVoltageMilliVolt;   // charger output voltage
+    std::pair<uint32_t, uint32_t> ChargerCurrentMilliAmp;    // charger output current
+
+    frozen::string const& getCsAsString() const;
+    frozen::string const& getErrAsString() const;
+    frozen::string const& getOrAsString() const;
+};
+
 struct veShuntStruct : veStruct {
     int32_t T;                      // Battery temperature
     bool tempPresent;               // Battery temperature sensor is attached to the shunt
@@ -131,6 +161,10 @@ enum class VeDirectHexRegister : uint16_t {
     DeviceMode = 0x0200,
     DeviceState = 0x0201,
     RemoteControlUsed = 0x0202,
+    // Charge current limit (0.1 A/unit); volatile RAM register — safe for frequent writes.
+    // Verified against VE.Direct Blue Smart charger HEX protocol documentation.
+    // Example from VeDirectFrameHexHandler.cpp: sendHexCommand(SET, 0x2015, 64, 16) ~= 10 A
+    ChargeCurrentLimit = 0x2015,
     HistoryTotal = 0x104F,
     HistoryMPPTD30 = 0x10BE,
     BatteryVoltageSense = 0x2002,

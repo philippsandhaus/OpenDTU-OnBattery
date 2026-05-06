@@ -4,6 +4,7 @@
 #include <gridcharger/DummyStats.h>
 #include <gridcharger/huawei/Provider.h>
 #include <gridcharger/trucki/Provider.h>
+#include <gridcharger/victron/Provider.h>
 #include <Configuration.h>
 #include <MqttSettings.h>
 #include <LogHelper.h>
@@ -44,6 +45,9 @@ void Controller::updateSettings()
             break;
         case GridChargerProviderType::TRUCKI:
             _upProvider = std::make_unique<::GridChargers::Trucki::Provider>();
+            break;
+        case GridChargerProviderType::VICTRON_IP22:
+            _upProvider = std::make_unique<::GridChargers::Victron::Provider>();
             break;
         default:
             DTU_LOGW("Unknown provider: %d\r\n", config.GridCharger.Provider);

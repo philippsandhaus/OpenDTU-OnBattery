@@ -164,6 +164,14 @@ static const char* TAG = "pinmapping";
 #define VICTRON_PIN_RX3 GPIO_NUM_NC
 #endif
 
+#ifndef VICTRON_CHARGER_PIN_RX
+#define VICTRON_CHARGER_PIN_RX GPIO_NUM_NC
+#endif
+
+#ifndef VICTRON_CHARGER_PIN_TX
+#define VICTRON_CHARGER_PIN_TX GPIO_NUM_NC
+#endif
+
 #ifndef BATTERY_PIN_RX
 #define BATTERY_PIN_RX GPIO_NUM_NC
 #endif
@@ -320,6 +328,9 @@ PinMappingClass::PinMappingClass()
     _pinMapping.powermeter_dere = POWERMETER_PIN_DERE;
     _pinMapping.powermeter_rxen = POWERMETER_PIN_RXEN;
     _pinMapping.powermeter_txen = POWERMETER_PIN_TXEN;
+
+    _pinMapping.victron_charger_rx = VICTRON_CHARGER_PIN_RX;
+    _pinMapping.victron_charger_tx = VICTRON_CHARGER_PIN_TX;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -430,6 +441,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.powermeter_dere = doc[i]["powermeter"]["dere"] | POWERMETER_PIN_DERE;
             _pinMapping.powermeter_rxen = doc[i]["powermeter"]["rxen"] | POWERMETER_PIN_RXEN;
             _pinMapping.powermeter_txen = doc[i]["powermeter"]["txen"] | POWERMETER_PIN_TXEN;
+
+            _pinMapping.victron_charger_rx = doc[i]["victron_charger"]["rx"] | VICTRON_CHARGER_PIN_RX;
+            _pinMapping.victron_charger_tx = doc[i]["victron_charger"]["tx"] | VICTRON_CHARGER_PIN_TX;
 
             return true;
         }

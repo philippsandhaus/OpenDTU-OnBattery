@@ -175,6 +175,10 @@ void WebApiGridChargerClass::onAdminGet(AsyncWebServerRequest* request)
     auto trucki = root["trucki"].to<JsonObject>();
     ConfigurationClass::serializeGridChargerTruckiConfig(config.GridCharger.Trucki, trucki);
 
+    auto victron = root["victron"].to<JsonObject>();
+    ConfigurationClass::serializeGridChargerVictronConfig(config.GridCharger.Victron, victron);
+
+
     response->setLength();
     request->send(response);
 }
@@ -205,6 +209,7 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         !(root["huawei"]["fan_offline_full_speed"].is<bool>()) ||
         !(root["trucki"]["ip_address"].is<const char*>()) ||
         !(root["trucki"]["password"].is<const char*>()) ||
+        !(root["victron"]["max_current_a"].is<float>()) ||
         !(root["voltage_limit"].is<float>()) ||
         !(root["lower_power_limit"].is<float>()) ||
         !(root["upper_power_limit"].is<float>())) {
@@ -242,6 +247,7 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         ConfigurationClass::deserializeGridChargerCanConfig(root["can"].as<JsonObject>(), config.GridCharger.Can);
         ConfigurationClass::deserializeGridChargerHuaweiConfig(root["huawei"].as<JsonObject>(), config.GridCharger.Huawei);
         ConfigurationClass::deserializeGridChargerTruckiConfig(root["trucki"].as<JsonObject>(), config.GridCharger.Trucki);
+        ConfigurationClass::deserializeGridChargerVictronConfig(root["victron"].as<JsonObject>(), config.GridCharger.Victron);
     }
 
     WebApi.writeConfig(retMsg);

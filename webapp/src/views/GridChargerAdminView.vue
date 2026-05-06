@@ -84,6 +84,21 @@
                         />
                     </template>
 
+                    <template v-if="gridChargerConfigList.provider === 3">
+                        <InputElement
+                            :label="$t('gridchargeradmin.VictronMaxCurrentA')"
+                            :tooltip="$t('gridchargeradmin.VictronMaxCurrentAHint')"
+                            v-model="gridChargerConfigList.victron.max_current_a"
+                            type="number"
+                            step="1"
+                            min="1"
+                            max="30"
+                            postfix="A"
+                            wide
+                        />
+                    </template>
+
+
                     <InputElement
                         :label="$t('gridchargeradmin.EnableAutoPower')"
                         v-model="gridChargerConfigList.auto_power_enabled"
@@ -289,6 +304,7 @@ export default defineComponent({
             providerTypeList: [
                 { key: 0, value: 'Huawei' },
                 { key: 1, value: 'Trucki' },
+                { key: 3, value: 'Victron Blue Smart IP22' },
             ],
             frequencyTypeList: [
                 { key: 8, value: 8000000 },

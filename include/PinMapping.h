@@ -76,6 +76,8 @@ struct PinMapping_t {
     gpio_num_t powermeter_dere;
     gpio_num_t powermeter_rxen;
     gpio_num_t powermeter_txen;
+    gpio_num_t victron_charger_rx;
+    gpio_num_t victron_charger_tx;
 };
 
 class PinMappingClass {

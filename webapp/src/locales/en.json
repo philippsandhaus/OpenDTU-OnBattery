@@ -1137,6 +1137,8 @@
         "IpAddress": "IP Address",
         "Password": "Password",
         "PasswordHint": "Leave empty if no password is set.",
+        "VictronMaxCurrentA": "Maximum Charge Current",
+        "VictronMaxCurrentAHint": "The maximum charge current for the Victron Blue Smart IP22. Adjusted dynamically.",
         "EnableAutoPower": "Automatic power control",
         "EnableBatterySoCLimits": "Use SoC data of a connected battery",
         "HuaweiSettings": "Huawei R48xx PSU Settings",

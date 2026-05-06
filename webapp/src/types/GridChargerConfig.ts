@@ -3,6 +3,11 @@ export interface GridChargerTruckiConfig {
     password: string;
 }
 
+export interface GridChargerVictronConfig {
+    max_current_a: number;
+}
+
+
 export interface GridChargerCanConfig {
     hardware_interface: number;
     controller_frequency: number;
@@ -31,4 +36,5 @@ export interface GridChargerConfig {
     can: GridChargerCanConfig;
     huawei: GridChargerHuaweiConfig;
     trucki: GridChargerTruckiConfig;
+    victron: GridChargerVictronConfig;
 }

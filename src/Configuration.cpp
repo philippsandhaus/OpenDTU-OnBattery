@@ -278,6 +278,12 @@ void ConfigurationClass::serializeGridChargerTruckiConfig(GridChargerTruckiConfi
     target["password"] = source.Password;
 }
 
+void ConfigurationClass::serializeGridChargerVictronConfig(GridChargerVictronConfig const& source, JsonObject& target)
+{
+    target["max_current_a"] = roundedFloat(source.MaxCurrentA);
+}
+
+
 bool ConfigurationClass::write()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "w");
@@ -467,6 +473,10 @@ bool ConfigurationClass::write()
 
     JsonObject gridcharger_trucki = gridcharger["trucki"].to<JsonObject>();
     serializeGridChargerTruckiConfig(config.GridCharger.Trucki, gridcharger_trucki);
+
+    JsonObject gridcharger_victron = gridcharger["victron"].to<JsonObject>();
+    serializeGridChargerVictronConfig(config.GridCharger.Victron, gridcharger_victron);
+
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
@@ -717,6 +727,12 @@ void ConfigurationClass::deserializeGridChargerTruckiConfig(JsonObject const& so
     strlcpy(target.Password, source["password"] | "", sizeof(target.Password));
 }
 
+void ConfigurationClass::deserializeGridChargerVictronConfig(JsonObject const& source, GridChargerVictronConfig& target)
+{
+    target.MaxCurrentA = source["max_current_a"] | GRIDCHARGER_VICTRON_MAX_CURRENT_A;
+}
+
+
 bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
@@ -930,6 +946,7 @@ bool ConfigurationClass::read()
     deserializeGridChargerCanConfig(gridcharger["can"], config.GridCharger.Can);
     deserializeGridChargerHuaweiConfig(gridcharger["huawei"], config.GridCharger.Huawei);
     deserializeGridChargerTruckiConfig(gridcharger["trucki"], config.GridCharger.Trucki);
+    deserializeGridChargerVictronConfig(gridcharger["victron"], config.GridCharger.Victron);
 
     f.close();
 

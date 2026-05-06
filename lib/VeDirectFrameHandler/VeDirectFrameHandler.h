@@ -93,3 +93,4 @@ private:
 
 template class VeDirectFrameHandler<veMpptStruct>;
 template class VeDirectFrameHandler<veShuntStruct>;
+template class VeDirectFrameHandler<veChargerStruct>;

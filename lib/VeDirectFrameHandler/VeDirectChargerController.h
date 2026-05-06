@@ -25,9 +25,10 @@ public:
 
     void loop() final;
 
-    // Set the charge current limit in Ampere (rounded to the nearest integer).
-    // Uses register 0xEDF0 "Battery maximum current" (1 A/unit, uint16).
-    // Source: BlueSolar-HEX-protocol.pdf.
+    // Set the charge current limit in Ampere.
+    // Uses register 0xEDF0 "Battery maximum current" (0.1 A/unit, uint16).
+    // Source: BlueSolar-HEX-protocol.pdf + pvtex/Victron_BlueSmart_IP22 reference impl.
+    // Example: 10 A → register value 100.
     // IMPORTANT: 0xEDF0 is in the EEPROM-mapped range — writes are rate-limited
     // internally to at most once per MIN_CURRENT_WRITE_INTERVAL_MS to protect flash.
     void setChargeCurrent(float ampere);

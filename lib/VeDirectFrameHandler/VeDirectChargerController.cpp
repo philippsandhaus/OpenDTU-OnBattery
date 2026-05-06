@@ -172,17 +172,20 @@ void VeDirectChargerController::setChargeCurrent(float ampere)
         return;
     }
 
-    uint32_t intValue = static_cast<uint32_t>(roundf(ampere));
-    if (static_cast<uint32_t>(roundf(_lastWrittenCurrentA)) == intValue) {
+    // Unit: 0.1 A per register unit. Source: pvtex/Victron_BlueSmart_IP22 (verified
+    // against BlueSolar-HEX-protocol.pdf register 0xEDF0 "Battery maximum current").
+    uint32_t regValue = static_cast<uint32_t>(roundf(ampere * 10.0f));
+    uint32_t lastRegValue = static_cast<uint32_t>(roundf(_lastWrittenCurrentA * 10.0f));
+    if (lastRegValue == regValue) {
         return; // no change — skip write
     }
 
     for (auto& entry : _hexQueue) {
         if (entry._hexRegister == VeDirectHexRegister::BatteryMaxCurrent) {
-            entry._data = intValue; // 1 A per unit (uint16)
+            entry._data = regValue; // 0.1 A per unit (uint16), e.g. 10 A → 100
             _lastCurrentWriteMillis = now;
-            _lastWrittenCurrentA = static_cast<float>(intValue);
-            DTU_LOGI("Queued BatteryMaxCurrent = %u A (0xEDF0)", intValue);
+            _lastWrittenCurrentA = ampere;
+            DTU_LOGI("Queued BatteryMaxCurrent = %u (%.1f A) → reg 0xEDF0", regValue, ampere);
             return;
         }
     }

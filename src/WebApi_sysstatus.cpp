@@ -14,6 +14,7 @@
 #include <Hoymiles.h>
 #include <LittleFS.h>
 #include <ResetReason.h>
+#include "RuntimeData.h"
 
 void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -41,8 +42,12 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
     root["heap_max_block"] = ESP.getMaxAllocHeap();
     root["heap_min_free"] = ESP.getMinFreeHeap();
+
     root["psram_total"] = ESP.getPsramSize();
     root["psram_used"] = ESP.getPsramSize() - ESP.getFreePsram();
+    root["psram_max_block"] = ESP.getMaxAllocPsram();
+    root["psram_min_free"] = ESP.getMinFreePsram();
+
     root["sketch_total"] = ESP.getFreeSketchSpace();
     root["sketch_used"] = ESP.getSketchSize();
     root["littlefs_total"] = LittleFS.totalBytes();
@@ -79,6 +84,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["resetreason_1"] = reason;
 
     root["cfgsavecount"] = Configuration.get().Cfg.SaveCount;
+    root["runtime_savecount"] = RuntimeData.getWriteCountAndTimeString();
 
     char version[16];
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
